@@ -45,6 +45,8 @@
 
 #define GPIO_OUTPUT_MAINLED 16
 #define GPIO_OUTPUT_MAINLED_0 13 /* use as ground */
+#define GPIO_OUTPUT_GUPPY   16
+#define GPIO_OUTPUT_TETRA   4
 
 #define GPIO_OUTPUT_NOUSE1 14
 #define GPIO_OUTPUT_NOUSE2 12
