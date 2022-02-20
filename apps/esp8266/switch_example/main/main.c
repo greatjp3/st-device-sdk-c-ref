@@ -31,6 +31,7 @@
 #include "iot_cli_cmd.h"
 
 #include "caps_switch.h"
+#include "caps_momentary.h"
 
 // onboarding_config_start is null-terminated string
 extern const uint8_t onboarding_config_start[]    asm("_binary_onboarding_config_json_start");
@@ -50,6 +51,7 @@ IOT_CTX* ctx = NULL;
 static int noti_led_mode = LED_ANIMATION_MODE_IDLE;
 
 static caps_switch_data_t *cap_switch_data;
+static caps_momentary_data_t *caps_momentary_data;
 
 static int get_switch_state(void)
 {
@@ -74,6 +76,23 @@ static void cap_switch_cmd_cb(struct caps_switch_data *caps_data)
     change_switch_state(switch_state);
 }
 
+static void caps_momentary_cmd_push_cb(IOT_CAP_HANDLE *handle, iot_cap_cmd_data_t *cmd_data, void *usr_data)
+{
+    caps_momentary_data_t *caps_data = (caps_momentary_data_t *)usr_data;
+
+    printf("called [%s] func with num_args:%u\n", __func__, cmd_data->num_args);
+
+    // if (caps_data && caps_data->cmd_push_usr_cb)
+    //     caps_data->cmd_push_usr_cb(caps_data);
+}
+
+static void caps_momentary_init_cb(IOT_CAP_HANDLE *handle, void *usr_data)
+{
+    caps_momentary_data_t *caps_data = usr_data;
+    if (caps_data && caps_data->init_usr_cb)
+        caps_data->init_usr_cb(caps_data);
+}
+
 static void capability_init()
 {
     cap_switch_data = caps_switch_initialize(ctx, "main", NULL, NULL);
@@ -85,6 +104,12 @@ static void capability_init()
 
         cap_switch_data->set_switch_value(cap_switch_data, switch_init_value);
     }
+
+    caps_momentary_data = caps_momentary_initialize(ctx, "main", NULL, NULL);
+    if (caps_momentary_data) {
+        caps_momentary_data->cmd_push_usr_cb = caps_momentary_cmd_push_cb;        
+    }
+
 }
 
 static void iot_status_cb(iot_status_t status,

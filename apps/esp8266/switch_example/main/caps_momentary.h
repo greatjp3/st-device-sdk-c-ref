@@ -22,24 +22,16 @@
 extern "C" {
 #endif
 
-typedef struct caps_feedpet_data {
+typedef struct caps_momentary_data {
     IOT_CAP_HANDLE* handle;
     void *usr_data;
     void *cmd_data;
 
-    char *feedpet_value;
+    void (*init_usr_cb)(struct caps_momentary_data *caps_data);
+    void (*cmd_push_usr_cb)(struct caps_momentary_data *caps_data);
+} caps_momentary_data_t;
 
-    const char *(*get_feedpet_value)(struct caps_feedpet_data *caps_data);
-    void (*set_feedpet_value)(struct caps_feedpet_data *caps_data, const char *value);
-    int (*attr_feedpet_str2idx)(const char *value);
-    void (*attr_feedpet_send)(struct caps_feedpet_data *caps_data);
-
-    void (*init_usr_cb)(struct caps_feedpet_data *caps_data);
-
-    void (*cmd_push_usr_cb)(struct caps_feedpet_data *caps_data);
-} caps_feedpet_data_t;
-
-caps_feedpet_data_t *caps_feedpet_initialize(IOT_CTX *ctx, const char *component, void *init_usr_cb, void *usr_data);
+caps_momentary_data_t *caps_momentary_initialize(IOT_CTX *ctx, const char *component, void *init_usr_cb, void *usr_data);
 #ifdef __cplusplus
 }
 #endif
