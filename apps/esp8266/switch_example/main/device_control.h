@@ -45,11 +45,16 @@
 
 #define GPIO_OUTPUT_MAINLED 16
 #define GPIO_OUTPUT_MAINLED_0 13 /* use as ground */
-#define GPIO_OUTPUT_GUPPY   16
-#define GPIO_OUTPUT_TETRA   4
+
+#define GPIO_OUTPUT_GUPPY   13   //14  //16
+#define GPIO_OUTPUT_TETRA   2   //12  //4
 
 #define GPIO_OUTPUT_NOUSE1 14
 #define GPIO_OUTPUT_NOUSE2 12
+
+#define GPIO_FEED_GUPPY     14
+#define GPIO_FEED_TETRA     12
+#define GPIO_FEED_GOLDFISH  4
 
 #endif
 
@@ -89,3 +94,6 @@ int get_button_event(int* button_event_type, int* button_event_count);
 void led_blink(int switch_state, int delay, int count);
 void change_led_mode(int noti_led_mode);
 void iot_gpio_init(void);
+
+void iot_pwm_init(void);
+void push_momentary(void);

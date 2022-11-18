@@ -49,6 +49,7 @@ IOT_CTX* ctx = NULL;
 //#define SET_PIN_NUMBER_CONFRIM
 
 static int noti_led_mode = LED_ANIMATION_MODE_IDLE;
+static bool momentary_sw_status = false;
 
 static caps_switch_data_t *cap_switch_data;
 static caps_momentary_data_t *caps_momentary_data;
@@ -80,8 +81,9 @@ static void caps_momentary_cmd_push_cb(IOT_CAP_HANDLE *handle, iot_cap_cmd_data_
 {
     caps_momentary_data_t *caps_data = (caps_momentary_data_t *)usr_data;
 
-    printf("called [%s] func with num_args:%u\n", __func__, cmd_data->num_args);
-
+    printf("called1 [%s] func with num_args:%u\n", __func__, cmd_data->num_args);
+    momentary_sw_status = true;
+    printf("done\n");
     // if (caps_data && caps_data->cmd_push_usr_cb)
     //     caps_data->cmd_push_usr_cb(caps_data);
 }
@@ -242,6 +244,12 @@ static void app_main_task(void *arg)
             change_led_mode(noti_led_mode);
         }
 
+        if (momentary_sw_status ){
+            momentary_sw_status = false;
+            push_momentary();
+            printf("momentary sw: true\n");
+        }
+
         vTaskDelay(10 / portTICK_PERIOD_MS);
     }
 }
@@ -289,6 +297,7 @@ void app_main(void)
     capability_init();
 
     iot_gpio_init();
+    iot_pwm_init();
     register_iot_cli_cmd();
     uart_cli_main();
     xTaskCreate(app_main_task, "app_main_task", 4096, NULL, 10, NULL);

@@ -23,15 +23,78 @@
 #include "freertos/queue.h"
 #include "freertos/task.h"
 #include "driver/gpio.h"
+#include "driver/pwm.h"
+
+inline uint16_t get_servo_duty_cycle(double angle) {
+  if (angle > 180) return -1;
+  return (uint16_t)((0.025 + (0.12 - 0.025) * (angle / 180.0)) *
+                    (double)UINT16_MAX);
+}
+
+void push_momentary(void)
+{
+    // guppy1 
+    printf("1\n");
+    pwm_set_duty(0, 1000);
+    pwm_start();
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    printf("2\n");
+    pwm_set_duty(0, 1600);
+    pwm_start();
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    pwm_set_duty(0, 0);
+    pwm_start();
+    printf("3\n");
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    //vTaskDelay(2000 / portTICK_PERIOD_MS);
+    // tetra
+    printf("4\n");
+    pwm_set_duty(1, 1000);
+    pwm_start();
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    printf("5\n");
+    pwm_set_duty(1, 1600);
+    pwm_start();
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    pwm_set_duty(1, 0);
+    pwm_start();
+    printf("6\n");
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    //vTaskDelay(2000 / portTICK_PERIOD_MS);
+    // //gold fish
+    printf("7\n");
+    pwm_set_duty(2, 1000);
+    pwm_start();
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    printf("8\n");
+    pwm_set_duty(2, 1600);
+    pwm_start();
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    printf("9\n");
+    pwm_set_duty(2, 1000);
+    pwm_start();
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    printf("10\n");
+    pwm_set_duty(2, 1600);
+    pwm_start();
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    printf("11\n");
+    pwm_set_duty(2, 0);
+    pwm_start();
+    printf("12\n");
+    pwm_stop(0x0);
+    //vTaskDelay(1000 / portTICK_PERIOD_MS);
+    //vTaskDelay(2000 / portTICK_PERIOD_MS);
+}
 
 void change_switch_state(int switch_state)
 {
     if (switch_state == SWITCH_OFF) {
-        gpio_set_level(GPIO_OUTPUT_GUPPY, MAINLED_GPIO_ON);
         gpio_set_level(GPIO_OUTPUT_TETRA, MAINLED_GPIO_ON);
+        gpio_set_level(GPIO_OUTPUT_GUPPY, MAINLED_GPIO_ON);
     } else {
-        gpio_set_level(GPIO_OUTPUT_GUPPY, MAINLED_GPIO_OFF);
         gpio_set_level(GPIO_OUTPUT_TETRA, MAINLED_GPIO_OFF);
+        gpio_set_level(GPIO_OUTPUT_GUPPY, MAINLED_GPIO_OFF);
     }
 }
 
@@ -169,3 +232,24 @@ void iot_gpio_init(void)
 }
 
 
+void iot_pwm_init(void)
+{
+    uint32_t pin_no[3];
+    uint32_t duty[3];
+    pin_no[0] = (uint32_t) GPIO_FEED_GUPPY;
+    duty[0] = (uint32_t) 0;
+    pin_no[1] = (uint32_t) GPIO_FEED_TETRA;
+    duty[1] = (uint32_t) 0;
+    pin_no[2] = (uint32_t) GPIO_FEED_GOLDFISH;
+    duty[2] = (uint32_t) 0;
+
+    if( pwm_init((uint32_t) 20000, duty, 3, pin_no) != ESP_OK){
+        printf("pwm_init fail\n");
+    };
+
+    float phase[3] = { 0.0f, 0.0f, 0.0f};
+    if( pwm_set_phases(phase) != ESP_OK){
+        printf("pwm_set_phase fail\n");
+    };
+    pwm_start();
+}
